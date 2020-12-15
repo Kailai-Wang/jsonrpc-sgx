@@ -1,6 +1,9 @@
 //! Delegate rpc calls
+pub extern crate sp_std;
 
-use std::collections::HashMap;
+use sp_std::collections::HashMap;
+
+#[cfg(feature = "std")]
 use std::sync::Arc;
 
 use crate::calls::{Metadata, RemoteProcedure, RpcMethod, RpcNotification};
@@ -8,11 +11,13 @@ use crate::types::{Error, Params, Value};
 use crate::BoxFuture;
 use futures::Future;
 
+#[cfg(feature = "std")]
 struct DelegateAsyncMethod<T, F> {
 	delegate: Arc<T>,
 	closure: F,
 }
 
+#[cfg(feature = "std")]
 impl<T, M, F, I> RpcMethod<M> for DelegateAsyncMethod<T, F>
 where
 	M: Metadata,
@@ -27,11 +32,13 @@ where
 	}
 }
 
+#[cfg(feature = "std")]
 struct DelegateMethodWithMeta<T, F> {
 	delegate: Arc<T>,
 	closure: F,
 }
 
+#[cfg(feature = "std")]
 impl<T, M, F, I> RpcMethod<M> for DelegateMethodWithMeta<T, F>
 where
 	M: Metadata,
@@ -46,11 +53,13 @@ where
 	}
 }
 
+#[cfg(feature = "std")]
 struct DelegateNotification<T, F> {
 	delegate: Arc<T>,
 	closure: F,
 }
 
+#[cfg(feature = "std")]
 impl<T, M, F> RpcNotification<M> for DelegateNotification<T, F>
 where
 	M: Metadata,
@@ -64,11 +73,13 @@ where
 	}
 }
 
+#[cfg(feature = "std")]
 struct DelegateNotificationWithMeta<T, F> {
 	delegate: Arc<T>,
 	closure: F,
 }
 
+#[cfg(feature = "std")]
 impl<T, M, F> RpcNotification<M> for DelegateNotificationWithMeta<T, F>
 where
 	M: Metadata,
@@ -83,6 +94,7 @@ where
 }
 
 /// A set of RPC methods and notifications tied to single `delegate` struct.
+#[cfg(feature = "std")]
 pub struct IoDelegate<T, M = ()>
 where
 	T: Send + Sync + 'static,
@@ -92,6 +104,7 @@ where
 	methods: HashMap<String, RemoteProcedure<M>>,
 }
 
+#[cfg(feature = "std")]
 impl<T, M> IoDelegate<T, M>
 where
 	T: Send + Sync + 'static,
@@ -174,6 +187,7 @@ where
 	}
 }
 
+#[cfg(feature = "std")]
 impl<T, M> crate::io::IoHandlerExtension<M> for IoDelegate<T, M>
 where
 	T: Send + Sync + 'static,
@@ -184,13 +198,15 @@ where
 	}
 }
 
+#[cfg(feature = "std")]
 impl<T, M> IntoIterator for IoDelegate<T, M>
 where
 	T: Send + Sync + 'static,
 	M: Metadata,
 {
 	type Item = (String, RemoteProcedure<M>);
-	type IntoIter = std::collections::hash_map::IntoIter<String, RemoteProcedure<M>>;
+	type IntoIter = sp_std::collections::hash_map::IntoIter<String, RemoteProcedure<M>>;
+	
 
 	fn into_iter(self) -> Self::IntoIter {
 		self.methods.into_iter()

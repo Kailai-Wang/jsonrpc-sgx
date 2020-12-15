@@ -1,13 +1,25 @@
+pub extern crate sp_std; 
+
+#[cfg(feature = "std")]
 use std::collections::{
 	hash_map::{IntoIter, Iter},
 	HashMap,
 };
-use std::ops::{Deref, DerefMut};
+
+use sp_std::ops::{Deref, DerefMut};
+use sp_std::boxed::Box;
+
+#[cfg(feature = "std")]
 use std::pin::Pin;
+#[cfg(not(feature = "std"))]
+use core::pin::Pin;
+
+#[cfg(feature = "std")]
 use std::sync::Arc;
 
 use futures::{self, future, Future, FutureExt};
 use serde_json;
+
 
 use crate::calls::{
 	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
@@ -77,6 +89,7 @@ impl Compatibility {
 ///
 /// By default compatible only with jsonrpc v2
 #[derive(Clone, Debug)]
+#[cfg(feature = "std")]
 pub struct MetaIoHandler<T: Metadata, S: Middleware<T> = middleware::Noop> {
 	middleware: S,
 	compatibility: Compatibility,
@@ -89,6 +102,7 @@ impl<T: Metadata> Default for MetaIoHandler<T> {
 	}
 }
 
+#[cfg(feature = "std")]
 impl<T: Metadata, S: Middleware<T>> IntoIterator for MetaIoHandler<T, S> {
 	type Item = (String, RemoteProcedure<T>);
 	type IntoIter = IntoIter<String, RemoteProcedure<T>>;
@@ -98,6 +112,7 @@ impl<T: Metadata, S: Middleware<T>> IntoIterator for MetaIoHandler<T, S> {
 	}
 }
 
+#[cfg(feature = "std")]
 impl<'a, T: Metadata, S: Middleware<T>> IntoIterator for &'a MetaIoHandler<T, S> {
 	type Item = (&'a String, &'a RemoteProcedure<T>);
 	type IntoIter = Iter<'a, String, RemoteProcedure<T>>;
@@ -187,6 +202,7 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 	}
 
 	/// Extend this `MetaIoHandler` with methods defined elsewhere.
+	#[cfg(feature = "std")]
 	pub fn extend_with<F>(&mut self, methods: F)
 	where
 		F: IntoIterator<Item = (String, RemoteProcedure<T>)>,
@@ -522,8 +538,8 @@ mod tests {
 
 		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
 	}
-
-	#[test]
+	
+	#[cfg(all(feature = "std", test))]
 	fn test_notification() {
 		use std::sync::atomic;
 		use std::sync::Arc;
@@ -563,7 +579,7 @@ mod tests {
 		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
 	}
 
-	#[test]
+	#[cfg(all(feature = "std", test))]
 	fn test_notification_alias() {
 		use std::sync::atomic;
 		use std::sync::Arc;
@@ -582,7 +598,7 @@ mod tests {
 		assert_eq!(called.load(atomic::Ordering::SeqCst), true);
 	}
 
-	#[test]
+	#[cfg(all(feature = "std", test))]
 	fn test_batch_notification() {
 		use std::sync::atomic;
 		use std::sync::Arc;
@@ -614,7 +630,7 @@ mod tests {
 		assert!(is_send_sync(io))
 	}
 
-	#[test]
+	#[cfg(all(feature = "std", test))]
 	fn test_extending_by_multiple_delegates() {
 		use super::IoHandlerExtension;
 		use crate::delegates::IoDelegate;
