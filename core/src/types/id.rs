@@ -1,4 +1,5 @@
 //! jsonrpc id field
+use serde::{Serialize, Deserialize};
 
 /// Request Id
 #[derive(Debug, PartialEq, Clone, Hash, Eq, Deserialize, Serialize)]

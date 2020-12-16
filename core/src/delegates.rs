@@ -1,7 +1,8 @@
 //! Delegate rpc calls
 pub extern crate sp_std;
 
-use sp_std::collections::HashMap;
+#[cfg(feature = "std")]
+use std::collections::HashMap;
 
 #[cfg(feature = "std")]
 use std::sync::Arc;
@@ -205,7 +206,7 @@ where
 	M: Metadata,
 {
 	type Item = (String, RemoteProcedure<M>);
-	type IntoIter = sp_std::collections::hash_map::IntoIter<String, RemoteProcedure<M>>;
+	type IntoIter = std::collections::hash_map::IntoIter<String, RemoteProcedure<M>>;
 	
 
 	fn into_iter(self) -> Self::IntoIter {
