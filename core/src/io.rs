@@ -18,6 +18,7 @@ use core::pin::Pin;
 use std::sync::Arc;
 
 use futures::{self, future, Future, FutureExt};
+
 use serde_json;
 
 
@@ -213,6 +214,7 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 	/// Handle given request synchronously - will block until response is available.
 	/// If you have any asynchronous methods in your RPC it is much wiser to use
 	/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.
+	#[cfg(feature = "std")]
 	pub fn handle_request_sync(&self, request: &str, meta: T) -> Option<String> {
 		futures::executor::block_on(self.handle_request(request, meta))
 	}

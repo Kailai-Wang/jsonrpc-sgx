@@ -42,17 +42,11 @@ use core::pin::Pin;
 
 #[macro_use]
 extern crate log;
-//#[macro_use]
-//extern crate serde_derive;
-
-
 
 pub use futures;
 
 #[doc(hidden)]
 pub extern crate serde;
-use serde::{Serialize, Deserialize};
-
 #[doc(hidden)]
 pub extern crate serde_json;
 
