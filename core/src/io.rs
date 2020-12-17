@@ -9,7 +9,6 @@ use alloc::collections::{
 	BTreeMap,
 };
 
-#[cfg(not(feature = "std"))]
 use sp_std::{ops::{Deref, DerefMut}, boxed::Box, vec::Vec};
 
 #[cfg(not(feature = "std"))]
@@ -670,7 +669,6 @@ mod tests {
 		use std::sync::Arc;
 		#[cfg(not(feature = "std"))]
 		use alloc::sync::Arc;
-		#[cfg(not(feature = "std"))]
 		use sp_std::boxed::Box;
 
 		struct Test;

@@ -10,7 +10,6 @@ use std::sync::Arc;
 #[cfg(not(feature = "std"))]
 use alloc::{sync::Arc, string::String};
 
-#[cfg(not(feature = "std"))]
 use sp_std::boxed::Box;
 
 use crate::calls::{Metadata, RemoteProcedure, RpcMethod, RpcNotification};

@@ -16,7 +16,7 @@ pub fn main() {
 
 	let headers = 5;
 	assert_eq!(
-		io.handle_request_sync(request, Meta(headers)),
+		io.handle_request_sync(request, Meta(headers)),			
 		Some(response.to_owned())
 	);
 }

@@ -3,7 +3,6 @@ use super::{Error, ErrorCode, Id, Value, Version};
 use crate::Result as CoreResult;
 use serde::{Serialize, Deserialize};
 
-#[cfg(not(feature = "std"))]
 use sp_std::{vec::Vec, vec};
 
 /// Successful response

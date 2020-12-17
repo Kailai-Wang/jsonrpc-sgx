@@ -2,13 +2,12 @@ use crate::types::{Error, Params, Value};
 use crate::BoxFuture;
 use futures::Future;
 use sp_std::boxed::Box;
+use sp_std::fmt;
+
 #[cfg(feature = "std")]
 use std::sync::Arc;
 #[cfg(not(feature = "std"))]
 use alloc::{sync::Arc, string::String};
-
-#[cfg(not(feature = "std"))]
-use sp_std::fmt;
 
 /// Metadata trait
 pub trait Metadata: Clone + Send + 'static {}
