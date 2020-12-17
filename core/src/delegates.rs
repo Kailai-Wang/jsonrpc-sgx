@@ -1,24 +1,29 @@
 //! Delegate rpc calls
-pub extern crate sp_std;
-
 #[cfg(feature = "std")]
 use std::collections::HashMap;
+#[cfg(not(feature = "std"))]
+use alloc::collections::BTreeMap;
+
 
 #[cfg(feature = "std")]
 use std::sync::Arc;
+#[cfg(not(feature = "std"))]
+use alloc::{sync::Arc, string::String};
+
+#[cfg(not(feature = "std"))]
+use sp_std::boxed::Box;
 
 use crate::calls::{Metadata, RemoteProcedure, RpcMethod, RpcNotification};
+
 use crate::types::{Error, Params, Value};
 use crate::BoxFuture;
 use futures::Future;
 
-#[cfg(feature = "std")]
 struct DelegateAsyncMethod<T, F> {
 	delegate: Arc<T>,
 	closure: F,
 }
 
-#[cfg(feature = "std")]
 impl<T, M, F, I> RpcMethod<M> for DelegateAsyncMethod<T, F>
 where
 	M: Metadata,
@@ -33,13 +38,11 @@ where
 	}
 }
 
-#[cfg(feature = "std")]
 struct DelegateMethodWithMeta<T, F> {
 	delegate: Arc<T>,
 	closure: F,
 }
 
-#[cfg(feature = "std")]
 impl<T, M, F, I> RpcMethod<M> for DelegateMethodWithMeta<T, F>
 where
 	M: Metadata,
@@ -54,13 +57,11 @@ where
 	}
 }
 
-#[cfg(feature = "std")]
 struct DelegateNotification<T, F> {
 	delegate: Arc<T>,
 	closure: F,
 }
 
-#[cfg(feature = "std")]
 impl<T, M, F> RpcNotification<M> for DelegateNotification<T, F>
 where
 	M: Metadata,
@@ -74,13 +75,11 @@ where
 	}
 }
 
-#[cfg(feature = "std")]
 struct DelegateNotificationWithMeta<T, F> {
 	delegate: Arc<T>,
 	closure: F,
 }
 
-#[cfg(feature = "std")]
 impl<T, M, F> RpcNotification<M> for DelegateNotificationWithMeta<T, F>
 where
 	M: Metadata,
@@ -95,17 +94,19 @@ where
 }
 
 /// A set of RPC methods and notifications tied to single `delegate` struct.
-#[cfg(feature = "std")]
 pub struct IoDelegate<T, M = ()>
 where
 	T: Send + Sync + 'static,
 	M: Metadata,
 {
 	delegate: Arc<T>,
+	#[cfg(feature = "std")]
 	methods: HashMap<String, RemoteProcedure<M>>,
+	#[cfg(not(feature = "std"))]
+	methods: BTreeMap<String, RemoteProcedure<M>>,
+	
 }
 
-#[cfg(feature = "std")]
 impl<T, M> IoDelegate<T, M>
 where
 	T: Send + Sync + 'static,
@@ -115,7 +116,11 @@ where
 	pub fn new(delegate: Arc<T>) -> Self {
 		IoDelegate {
 			delegate,
+			#[cfg(feature = "std")]
 			methods: HashMap::new(),
+			#[cfg(not(feature = "std"))]
+			methods: BTreeMap::new(),
+			
 		}
 	}
 
@@ -188,7 +193,6 @@ where
 	}
 }
 
-#[cfg(feature = "std")]
 impl<T, M> crate::io::IoHandlerExtension<M> for IoDelegate<T, M>
 where
 	T: Send + Sync + 'static,
@@ -199,15 +203,16 @@ where
 	}
 }
 
-#[cfg(feature = "std")]
 impl<T, M> IntoIterator for IoDelegate<T, M>
 where
 	T: Send + Sync + 'static,
 	M: Metadata,
 {
 	type Item = (String, RemoteProcedure<M>);
+	#[cfg(feature = "std")]
 	type IntoIter = std::collections::hash_map::IntoIter<String, RemoteProcedure<M>>;
-	
+	#[cfg(not(feature = "std"))]
+	type IntoIter = alloc::collections::btree_map::IntoIter<String, RemoteProcedure<M>>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		self.methods.into_iter()

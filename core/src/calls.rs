@@ -1,10 +1,14 @@
-pub extern crate sp_std;
 use crate::types::{Error, Params, Value};
 use crate::BoxFuture;
 use futures::Future;
-use sp_std::fmt;
+use sp_std::boxed::Box;
 #[cfg(feature = "std")]
 use std::sync::Arc;
+#[cfg(not(feature = "std"))]
+use alloc::{sync::Arc, string::String};
+
+#[cfg(not(feature = "std"))]
+use sp_std::fmt;
 
 /// Metadata trait
 pub trait Metadata: Clone + Send + 'static {}
@@ -66,7 +70,6 @@ pub trait RpcNotification<T: Metadata>: Send + Sync + 'static {
 
 /// Possible Remote Procedures with Metadata
 #[derive(Clone)]
-#[cfg(feature = "std")]
 pub enum RemoteProcedure<T: Metadata> {
 	/// A method call
 	Method(Arc<dyn RpcMethod<T>>),

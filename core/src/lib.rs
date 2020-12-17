@@ -24,16 +24,12 @@
 
 /// Creates a vector of given pairs and calls `collect` on the iterator from it.
 /// Can be used to create a `HashMap`.
-/// // necessary?
-#[macro_export]
-macro_rules! map {
-	($( $name:expr => $value:expr ),* $(,)? ) => (
-		vec![ $( ( $name, $value ) ),* ].into_iter().collect()
-	);
-}
-
+#[cfg(not(feature = "std"))]
+pub extern crate alloc;
 
 pub extern crate sp_std; 
+use sp_std::str;
+use sp_std::boxed::Box;
 
 #[cfg(feature = "std")]
 use std::pin::Pin;
@@ -63,15 +59,17 @@ pub type Result<T> = sp_std::result::Result<T, Error>;
 /// A `Future` trait object.
 pub type BoxFuture<T> = Pin<Box<dyn futures::Future<Output = T> + Send>>;
 
-
 pub use crate::calls::{
 	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
-	WrapFuture,
+	WrapFuture
 };
+
 pub use crate::delegates::IoDelegate;
+
+pub use crate::io::{MetaIoHandler};
+
 pub use crate::io::{
 	Compatibility, FutureOutput, FutureResponse, FutureResult, FutureRpcResult, IoHandler, IoHandlerExtension,
-	MetaIoHandler,
 };
 pub use crate::middleware::{Middleware, Noop as NoopMiddleware};
 pub use crate::types::*;

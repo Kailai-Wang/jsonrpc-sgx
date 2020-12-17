@@ -1,13 +1,19 @@
-pub extern crate sp_std; 
-
 #[cfg(feature = "std")]
 use std::collections::{
 	hash_map::{IntoIter, Iter},
 	HashMap,
 };
+#[cfg(not(feature = "std"))]
+use alloc::collections::{
+	btree_map::{IntoIter, Iter},
+	BTreeMap,
+};
 
-use sp_std::ops::{Deref, DerefMut};
-use sp_std::boxed::Box;
+#[cfg(not(feature = "std"))]
+use sp_std::{ops::{Deref, DerefMut}, boxed::Box, vec::Vec};
+
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
 
 #[cfg(feature = "std")]
 use std::pin::Pin;
@@ -16,6 +22,8 @@ use core::pin::Pin;
 
 #[cfg(feature = "std")]
 use std::sync::Arc;
+#[cfg(not(feature = "std"))]
+use alloc::sync::Arc;
 
 use futures::{self, future, Future, FutureExt};
 
@@ -23,8 +31,9 @@ use serde_json;
 
 
 use crate::calls::{
-	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
+	Metadata, RpcMethod, RemoteProcedure, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
 };
+
 use crate::middleware::{self, Middleware};
 use crate::types::{Call, Output, Request, Response};
 use crate::types::{Error, ErrorCode, Version};
@@ -90,20 +99,20 @@ impl Compatibility {
 ///
 /// By default compatible only with jsonrpc v2
 #[derive(Clone, Debug)]
-#[cfg(feature = "std")]
 pub struct MetaIoHandler<T: Metadata, S: Middleware<T> = middleware::Noop> {
 	middleware: S,
 	compatibility: Compatibility,
+	#[cfg(feature = "std")]
 	methods: HashMap<String, RemoteProcedure<T>>,
+	#[cfg(not(feature = "std"))]
+	methods: BTreeMap<String, RemoteProcedure<T>>,
 }
-
 impl<T: Metadata> Default for MetaIoHandler<T> {
 	fn default() -> Self {
 		MetaIoHandler::with_compatibility(Default::default())
 	}
 }
 
-#[cfg(feature = "std")]
 impl<T: Metadata, S: Middleware<T>> IntoIterator for MetaIoHandler<T, S> {
 	type Item = (String, RemoteProcedure<T>);
 	type IntoIter = IntoIter<String, RemoteProcedure<T>>;
@@ -113,7 +122,6 @@ impl<T: Metadata, S: Middleware<T>> IntoIterator for MetaIoHandler<T, S> {
 	}
 }
 
-#[cfg(feature = "std")]
 impl<'a, T: Metadata, S: Middleware<T>> IntoIterator for &'a MetaIoHandler<T, S> {
 	type Item = (&'a String, &'a RemoteProcedure<T>);
 	type IntoIter = Iter<'a, String, RemoteProcedure<T>>;
@@ -143,7 +151,6 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 			methods: Default::default(),
 		}
 	}
-
 	/// Creates new `MetaIoHandler` with specified middleware.
 	pub fn with_middleware(middleware: S) -> Self {
 		MetaIoHandler {
@@ -203,7 +210,6 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 	}
 
 	/// Extend this `MetaIoHandler` with methods defined elsewhere.
-	#[cfg(feature = "std")]
 	pub fn extend_with<F>(&mut self, methods: F)
 	where
 		F: IntoIterator<Item = (String, RemoteProcedure<T>)>,
@@ -214,10 +220,10 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 	/// Handle given request synchronously - will block until response is available.
 	/// If you have any asynchronous methods in your RPC it is much wiser to use
 	/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.
-	#[cfg(feature = "std")]
 	pub fn handle_request_sync(&self, request: &str, meta: T) -> Option<String> {
 		futures::executor::block_on(self.handle_request(request, meta))
 	}
+
 
 	/// Handle given request asynchronously.
 	pub fn handle_request(&self, request: &str, meta: T) -> FutureResult<S::Future, S::CallFuture> {
@@ -394,7 +400,15 @@ impl<M: Metadata> IoHandlerExtension<M> for Vec<(String, RemoteProcedure<M>)> {
 	}
 }
 
+#[cfg(feature = "std")]
 impl<M: Metadata> IoHandlerExtension<M> for HashMap<String, RemoteProcedure<M>> {
+	fn augment<S: Middleware<M>>(self, handler: &mut MetaIoHandler<M, S>) {
+		handler.methods.extend(self)
+	}
+}
+
+#[cfg(not(feature = "std"))]
+impl<M: Metadata> IoHandlerExtension<M> for BTreeMap<String, RemoteProcedure<M>> {
 	fn augment<S: Middleware<M>>(self, handler: &mut MetaIoHandler<M, S>) {
 		handler.methods.extend(self)
 	}
@@ -504,6 +518,8 @@ mod tests {
 	use super::{Compatibility, IoHandler};
 	use crate::types::Value;
 	use futures::future;
+	#[cfg(not(feature = "std"))]
+	use alloc::string::ToString;
 
 	#[test]
 	fn test_io_handler() {
@@ -538,13 +554,17 @@ mod tests {
 		let request = r#"{"jsonrpc": "2.0", "method": "say_hello", "params": [42, 23], "id": 1}"#;
 		let response = r#"{"jsonrpc":"2.0","result":"hello","id":1}"#;
 
-		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
+		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));		
 	}
 	
-	#[cfg(all(feature = "std", test))]
+	#[cfg(test)]
 	fn test_notification() {
-		use std::sync::atomic;
-		use std::sync::Arc;
+		#[cfg(feature = "std")]
+		use std::sync::{atomic, Arc};
+		#[cfg(not(feature = "std"))]
+		use core::sync::atomic;
+		#[cfg(not(feature = "std"))]
+		use alloc::sync::Arc;
 
 		let mut io = IoHandler::new();
 
@@ -566,7 +586,7 @@ mod tests {
 		let request = r#"{"jsonrpc": "2.0", "method": "say_hello", "params": [42, 23], "id": 1}"#;
 		let response = r#"{"jsonrpc":"2.0","error":{"code":-32601,"message":"Method not found"},"id":1}"#;
 
-		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
+		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));		
 	}
 
 	#[test]
@@ -578,13 +598,17 @@ mod tests {
 		let request = r#"{"jsonrpc": "2.0", "method": "say_hello_alias", "params": [42, 23], "id": 1}"#;
 		let response = r#"{"jsonrpc":"2.0","result":"hello","id":1}"#;
 
-		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
+		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));		
 	}
 
-	#[cfg(all(feature = "std", test))]
+	#[cfg(test)]
 	fn test_notification_alias() {
-		use std::sync::atomic;
-		use std::sync::Arc;
+		#[cfg(feature = "std")]
+		use std::sync::{atomic, Arc};
+		#[cfg(not(feature = "std"))]
+		use core::sync::atomic;
+		#[cfg(not(feature = "std"))]
+		use alloc::sync::Arc;
 
 		let mut io = IoHandler::new();
 
@@ -596,14 +620,19 @@ mod tests {
 		io.add_alias("say_hello_alias", "say_hello");
 
 		let request = r#"{"jsonrpc": "2.0", "method": "say_hello_alias", "params": [42, 23]}"#;
+
 		assert_eq!(io.handle_request_sync(request), None);
 		assert_eq!(called.load(atomic::Ordering::SeqCst), true);
 	}
 
-	#[cfg(all(feature = "std", test))]
+	#[cfg(test)]
 	fn test_batch_notification() {
-		use std::sync::atomic;
-		use std::sync::Arc;
+		#[cfg(feature = "std")]
+		use std::sync::{atomic, Arc};
+		#[cfg(not(feature = "std"))]
+		use core::sync::atomic;
+		#[cfg(not(feature = "std"))]
+		use alloc::sync::Arc;
 
 		let mut io = IoHandler::new();
 
@@ -614,7 +643,8 @@ mod tests {
 		});
 
 		let request = r#"[{"jsonrpc": "2.0", "method": "say_hello", "params": [42, 23]}]"#;
-		assert_eq!(io.handle_request_sync(request), None);
+
+		assert_eq!(io.handle_request_sync(request), None);		
 		assert_eq!(called.load(atomic::Ordering::SeqCst), true);
 	}
 
@@ -632,11 +662,16 @@ mod tests {
 		assert!(is_send_sync(io))
 	}
 
-	#[cfg(all(feature = "std", test))]
+	#[cfg(test)]
 	fn test_extending_by_multiple_delegates() {
 		use super::IoHandlerExtension;
 		use crate::delegates::IoDelegate;
+		#[cfg(feature = "std")]
 		use std::sync::Arc;
+		#[cfg(not(feature = "std"))]
+		use alloc::sync::Arc;
+		#[cfg(not(feature = "std"))]
+		use sp_std::boxed::Box;
 
 		struct Test;
 		impl Test {

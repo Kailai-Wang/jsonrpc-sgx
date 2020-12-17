@@ -2,7 +2,6 @@
 use serde::de::{self, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-pub extern crate sp_std;
 use sp_std::fmt;
 
 /// Protocol Version

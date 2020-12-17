@@ -1,5 +1,7 @@
 //! jsonrpc id field
 use serde::{Serialize, Deserialize};
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
 
 /// Request Id
 #[derive(Debug, PartialEq, Clone, Hash, Eq, Deserialize, Serialize)]
@@ -21,6 +23,10 @@ mod tests {
 
 	#[test]
 	fn id_deserialization() {
+		use sp_std::vec;
+		use sp_std::vec::Vec;
+		use sp_std::borrow::ToOwned;
+
 		let s = r#""2""#;
 		let deserialized: Id = serde_json::from_str(s).unwrap();
 		assert_eq!(deserialized, Id::Str("2".into()));
@@ -43,6 +49,8 @@ mod tests {
 
 	#[test]
 	fn id_serialization() {
+		use sp_std::vec;
+		use sp_std::borrow::ToOwned;
 		let d = vec![
 			Id::Null,
 			Id::Num(0),

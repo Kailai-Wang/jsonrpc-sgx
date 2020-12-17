@@ -3,10 +3,12 @@
 use crate::calls::Metadata;
 use crate::types::{Call, Output, Request, Response};
 use futures::{future::Either, Future};
+use sp_std::boxed::Box;
 #[cfg(feature = "std")]
 use std::pin::Pin;
 #[cfg(not(feature = "std"))]
 use core::pin::Pin;
+
 
 /// RPC middleware
 pub trait Middleware<M: Metadata>: Send + Sync + 'static {

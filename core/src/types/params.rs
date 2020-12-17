@@ -4,6 +4,13 @@ use serde::de::DeserializeOwned;
 use serde_json;
 use serde_json::value::from_value;
 
+use sp_std::vec::Vec;
+
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+#[cfg(not(feature = "std"))]
+use alloc::format;
+
 
 use super::{Error, Value};
 
@@ -56,6 +63,11 @@ mod tests {
 	use crate::types::{Error, ErrorCode, Value};
 	use serde_json;
 
+	#[cfg(not(feature = "std"))]
+	use alloc::vec;
+	#[cfg(not(feature = "std"))]
+	use alloc::string::ToString;
+
 	#[test]
 	fn params_deserialization() {
 		let s = r#"[null, true, -1, 4, 2.3, "hello", [0], {"key": "value"}, []]"#;
@@ -82,6 +94,9 @@ mod tests {
 
 	#[test]
 	fn should_return_meaningful_error_when_deserialization_fails() {
+		#[cfg(not(feature = "std"))]
+		use alloc::string::String;
+
 		// given
 		let s = r#"[1, true]"#;
 		let params = || serde_json::from_str::<Params>(s).unwrap();

@@ -1,5 +1,11 @@
 //! jsonrpc errors
+#[cfg(not(feature = "std"))]
+use alloc::{string::{ToString, String}, format};
+
 pub extern crate sp_std;
+use sp_std::borrow::ToOwned;
+
+
 use super::Value;
 use serde::{Serialize, Serializer, Deserialize, Deserializer};
 //use serde::de::{Deserializer};
@@ -23,6 +29,7 @@ pub enum ErrorCode {
 	/// Reserved for implementation-defined server-errors.
 	ServerError(i64),
 }
+
 
 impl ErrorCode {
 	/// Returns integer code value
