@@ -30,7 +30,6 @@ pub enum ErrorCode {
 	ServerError(i64),
 }
 
-
 impl ErrorCode {
 	/// Returns integer code value
 	pub fn code(&self) -> i64 {

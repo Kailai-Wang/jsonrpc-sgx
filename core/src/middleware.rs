@@ -41,13 +41,10 @@ pub trait Middleware<M: Metadata>: Send + Sync + 'static {
 	}
 }
 
-
 /// Dummy future used as a noop result of middleware.
 pub type NoopFuture = Pin<Box<dyn Future<Output = Option<Response>> + Send>>;
-
 /// Dummy future used as a noop call result of middleware.
 pub type NoopCallFuture = Pin<Box<dyn Future<Output = Option<Output>> + Send>>;
-
 
 /// No-op middleware implementation
 #[derive(Clone, Debug, Default)]

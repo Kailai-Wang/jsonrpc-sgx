@@ -25,14 +25,11 @@ use std::sync::Arc;
 use alloc::sync::Arc;
 
 use futures::{self, future, Future, FutureExt};
-
 use serde_json;
 
-
 use crate::calls::{
-	Metadata, RpcMethod, RemoteProcedure, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
+	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
 };
-
 use crate::middleware::{self, Middleware};
 use crate::types::{Call, Output, Request, Response};
 use crate::types::{Error, ErrorCode, Version};
@@ -85,7 +82,6 @@ impl Compatibility {
 			_ => false,
 		}
 	}
-
 	fn default_version(self) -> Option<Version> {
 		match self {
 			Compatibility::V1 => None,
@@ -222,7 +218,6 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 	pub fn handle_request_sync(&self, request: &str, meta: T) -> Option<String> {
 		futures::executor::block_on(self.handle_request(request, meta))
 	}
-
 
 	/// Handle given request asynchronously.
 	pub fn handle_request(&self, request: &str, meta: T) -> FutureResult<S::Future, S::CallFuture> {
@@ -553,10 +548,10 @@ mod tests {
 		let request = r#"{"jsonrpc": "2.0", "method": "say_hello", "params": [42, 23], "id": 1}"#;
 		let response = r#"{"jsonrpc":"2.0","result":"hello","id":1}"#;
 
-		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));		
+		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
 	}
 	
-	#[cfg(test)]
+	#[test]
 	fn test_notification() {
 		#[cfg(feature = "std")]
 		use std::sync::{atomic, Arc};
@@ -585,7 +580,7 @@ mod tests {
 		let request = r#"{"jsonrpc": "2.0", "method": "say_hello", "params": [42, 23], "id": 1}"#;
 		let response = r#"{"jsonrpc":"2.0","error":{"code":-32601,"message":"Method not found"},"id":1}"#;
 
-		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));		
+		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
 	}
 
 	#[test]
@@ -597,10 +592,10 @@ mod tests {
 		let request = r#"{"jsonrpc": "2.0", "method": "say_hello_alias", "params": [42, 23], "id": 1}"#;
 		let response = r#"{"jsonrpc":"2.0","result":"hello","id":1}"#;
 
-		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));		
+		assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
 	}
 
-	#[cfg(test)]
+	#[test]
 	fn test_notification_alias() {
 		#[cfg(feature = "std")]
 		use std::sync::{atomic, Arc};
@@ -624,7 +619,7 @@ mod tests {
 		assert_eq!(called.load(atomic::Ordering::SeqCst), true);
 	}
 
-	#[cfg(test)]
+	#[test]
 	fn test_batch_notification() {
 		#[cfg(feature = "std")]
 		use std::sync::{atomic, Arc};
@@ -661,7 +656,7 @@ mod tests {
 		assert!(is_send_sync(io))
 	}
 
-	#[cfg(test)]
+	#[test]
 	fn test_extending_by_multiple_delegates() {
 		use super::IoHandlerExtension;
 		use crate::delegates::IoDelegate;

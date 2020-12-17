@@ -61,21 +61,16 @@ pub type BoxFuture<T> = Pin<Box<dyn futures::Future<Output = T> + Send>>;
 
 pub use crate::calls::{
 	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
-	WrapFuture
+	WrapFuture,
 };
-
 pub use crate::delegates::IoDelegate;
-
-pub use crate::io::{MetaIoHandler};
-
 pub use crate::io::{
-	Compatibility, FutureOutput, FutureResponse, FutureResult, FutureRpcResult, IoHandler, IoHandlerExtension,
+	Compatibility, FutureOutput, FutureResponse, FutureResult, FutureRpcResult, IoHandler, IoHandlerExtension, MetaIoHandler,
 };
 pub use crate::middleware::{Middleware, Noop as NoopMiddleware};
 pub use crate::types::*;
 
 use serde_json::Error as SerdeError;
-
 
 /// workaround for https://github.com/serde-rs/json/issues/505
 /// Arbitrary precision confuses serde when deserializing into untagged enums,
