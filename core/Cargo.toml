@@ -20,11 +20,14 @@ categories = [
 
 [dependencies]
 log = {version = "0.4", default-features = false }
-sp-std  = { version = "2.0.0", default-features = false }
 futures = { version = "0.3", default-features = false, features = ["alloc", "executor"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
+[dependencies.sp-std]
+git = "https://github.com/paritytech/substrate.git"
+rev = "a208da16"
+default-features = false
 
 [features]
 arbitrary_precision = ["serde_json/arbitrary_precision"]
