@@ -19,10 +19,13 @@ categories = [
 ]
 
 [dependencies]
-log = {version = "0.4", default-features = false }
+log = { git = "https://github.com/mesalock-linux/log-sgx", default-features = false }
 futures = { version = "0.3", default-features = false, features = ["alloc", "executor"] }
-serde = { version = "1.0", default-features = false, features = ["derive"] }
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+serde        	  = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"]  }
+serde_json        = { git = "https://github.com/mesalock-linux/serde-json-sgx", features = ["alloc"]}
+serde_derive      = { git = "https://github.com/mesalock-linux/serde-sgx" }
+#serde = { version = "1.0", default-features = false, features = ["derive"] }
+#serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
 [dependencies.sp-std]
 git = "https://github.com/paritytech/substrate.git"
