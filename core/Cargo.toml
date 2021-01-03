@@ -20,7 +20,7 @@ categories = [
 
 [dependencies]
 log = { git = "https://github.com/mesalock-linux/log-sgx", default-features = false }
-futures = { version = "0.3", default-features = false, features = ["alloc", "executor"] }
+futures = { git = "https://github.com/mesalock-linux/futures-rs-sgx" }
 serde        	  = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"]  }
 serde_json        = { git = "https://github.com/mesalock-linux/serde-json-sgx", features = ["alloc"]}
 serde_derive      = { git = "https://github.com/mesalock-linux/serde-sgx" }
