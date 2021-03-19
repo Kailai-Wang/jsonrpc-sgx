@@ -8,7 +8,7 @@ keywords = ["jsonrpc", "json-rpc", "json", "rpc", "serde"]
 license = "MIT"
 name = "jsonrpc-core"
 repository = "https://github.com/paritytech/jsonrpc"
-version = "16.0.0"
+version = "16.1.0"
 
 categories = [
 	"asynchronous",
@@ -24,12 +24,10 @@ futures = { git = "https://github.com/mesalock-linux/futures-rs-sgx" }
 serde        	  = { git = "https://github.com/mesalock-linux/serde-sgx", features = ["derive"]  }
 serde_json        = { git = "https://github.com/mesalock-linux/serde-json-sgx", features = ["alloc"]}
 serde_derive      = { git = "https://github.com/mesalock-linux/serde-sgx" }
-#serde = { version = "1.0", default-features = false, features = ["derive"] }
-#serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
 [dependencies.sp-std]
 git = "https://github.com/paritytech/substrate.git"
-rev = "a208da16"
+version = "3.0.0"
 default-features = false
 
 [features]
@@ -45,4 +43,3 @@ std = [
 
 [badges]
 travis-ci = { repository = "paritytech/jsonrpc", branch = "master"}
-
