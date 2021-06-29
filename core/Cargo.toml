@@ -27,6 +27,7 @@ serde_derive      = { git = "https://github.com/mesalock-linux/serde-sgx" }
 
 [dependencies.sp-std]
 git = "https://github.com/paritytech/substrate.git"
+branch = "master"
 version = "3.0.0"
 default-features = false
 
