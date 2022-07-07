@@ -17,19 +17,26 @@
 //! ```
 
 #![deny(missing_docs)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
+/// Creates a vector of given pairs and calls `collect` on the iterator from it.
+/// Can be used to create a `HashMap`.
+#[cfg(not(feature = "std"))]
+pub extern crate alloc;
+
+pub extern crate sp_std;
+use sp_std::boxed::Box;
+use sp_std::str;
+
+#[cfg(not(feature = "std"))]
+use core::pin::Pin;
+#[cfg(feature = "std")]
 use std::pin::Pin;
 
 #[macro_use]
 extern crate log;
-#[macro_use]
-extern crate serde_derive;
 
-#[cfg(feature = "futures")]
 pub use futures;
-#[cfg(feature = "futures-executor")]
-pub use futures_executor;
-pub use futures_util;
 
 #[doc(hidden)]
 pub extern crate serde;
@@ -44,10 +51,10 @@ pub mod middleware;
 pub mod types;
 
 /// A Result type.
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T> = sp_std::result::Result<T, Error>;
 
 /// A `Future` trait object.
-pub type BoxFuture<T> = Pin<Box<dyn std::future::Future<Output = T> + Send>>;
+pub type BoxFuture<T> = Pin<Box<dyn futures::Future<Output = T> + Send>>;
 
 pub use crate::calls::{
 	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
@@ -66,7 +73,7 @@ use serde_json::Error as SerdeError;
 /// workaround for https://github.com/serde-rs/json/issues/505
 /// Arbitrary precision confuses serde when deserializing into untagged enums,
 /// this is a workaround
-pub fn serde_from_str<'a, T>(input: &'a str) -> std::result::Result<T, SerdeError>
+pub fn serde_from_str<'a, T>(input: &'a str) -> sp_std::result::Result<T, SerdeError>
 where
 	T: serde::de::Deserialize<'a>,
 {

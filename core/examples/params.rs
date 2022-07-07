@@ -1,5 +1,9 @@
 use jsonrpc_core::*;
-use serde_derive::Deserialize;
+use serde::Deserialize;
+use sp_std::borrow::ToOwned;
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
 
 #[derive(Deserialize)]
 struct HelloParams {

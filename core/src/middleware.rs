@@ -2,8 +2,11 @@
 
 use crate::calls::Metadata;
 use crate::types::{Call, Output, Request, Response};
-use futures_util::future::Either;
-use std::future::Future;
+#[cfg(not(feature = "std"))]
+use core::pin::Pin;
+use futures::{future::Either, Future};
+use sp_std::boxed::Box;
+#[cfg(feature = "std")]
 use std::pin::Pin;
 
 /// RPC middleware

@@ -1,7 +1,7 @@
 use jsonrpc_core::*;
 
 fn main() {
-	futures_executor::block_on(async {
+	futures::executor::block_on(async {
 		let mut io = IoHandler::new();
 
 		io.add_method("say_hello", |_: Params| async {

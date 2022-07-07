@@ -1,10 +1,20 @@
 //! Delegate rpc calls
-
+#[cfg(not(feature = "std"))]
+use alloc::collections::BTreeMap;
+#[cfg(feature = "std")]
 use std::collections::HashMap;
-use std::future::Future;
+
+use futures::Future;
+
+#[cfg(not(feature = "std"))]
+use alloc::{string::String, sync::Arc};
+#[cfg(feature = "std")]
 use std::sync::Arc;
 
+use sp_std::boxed::Box;
+
 use crate::calls::{Metadata, RemoteProcedure, RpcMethod, RpcNotification};
+
 use crate::types::{Error, Params, Value};
 use crate::BoxFuture;
 
@@ -89,7 +99,10 @@ where
 	M: Metadata,
 {
 	delegate: Arc<T>,
+	#[cfg(feature = "std")]
 	methods: HashMap<String, RemoteProcedure<M>>,
+	#[cfg(not(feature = "std"))]
+	methods: BTreeMap<String, RemoteProcedure<M>>,
 }
 
 impl<T, M> IoDelegate<T, M>
@@ -101,7 +114,10 @@ where
 	pub fn new(delegate: Arc<T>) -> Self {
 		IoDelegate {
 			delegate,
+			#[cfg(feature = "std")]
 			methods: HashMap::new(),
+			#[cfg(not(feature = "std"))]
+			methods: BTreeMap::new(),
 		}
 	}
 
@@ -190,7 +206,10 @@ where
 	M: Metadata,
 {
 	type Item = (String, RemoteProcedure<M>);
+	#[cfg(feature = "std")]
 	type IntoIter = std::collections::hash_map::IntoIter<String, RemoteProcedure<M>>;
+	#[cfg(not(feature = "std"))]
+	type IntoIter = alloc::collections::btree_map::IntoIter<String, RemoteProcedure<M>>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		self.methods.into_iter()

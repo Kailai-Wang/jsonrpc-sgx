@@ -1,13 +1,25 @@
+#[cfg(not(feature = "std"))]
+use alloc::{
+	collections::{
+		btree_map::{IntoIter, Iter},
+		BTreeMap,
+	},
+	string::String,
+	string::ToString,
+};
+use core::pin::Pin;
+use futures::{self, future, Future, FutureExt};
+use sp_std::{
+	boxed::Box,
+	ops::{Deref, DerefMut},
+	sync::Arc,
+	vec::Vec,
+};
+#[cfg(feature = "std")]
 use std::collections::{
 	hash_map::{IntoIter, Iter},
 	HashMap,
 };
-use std::future::Future;
-use std::ops::{Deref, DerefMut};
-use std::pin::Pin;
-use std::sync::Arc;
-
-use futures_util::{self, future, FutureExt};
 
 use crate::calls::{
 	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
@@ -64,7 +76,6 @@ impl Compatibility {
 			(Compatibility::V1, None) | (Compatibility::V2, Some(Version::V2)) | (Compatibility::Both, _)
 		)
 	}
-
 	fn default_version(self) -> Option<Version> {
 		match self {
 			Compatibility::V1 => None,
@@ -80,9 +91,11 @@ impl Compatibility {
 pub struct MetaIoHandler<T: Metadata, S: Middleware<T> = middleware::Noop> {
 	middleware: S,
 	compatibility: Compatibility,
+	#[cfg(feature = "std")]
 	methods: HashMap<String, RemoteProcedure<T>>,
+	#[cfg(not(feature = "std"))]
+	methods: BTreeMap<String, RemoteProcedure<T>>,
 }
-
 impl<T: Metadata> Default for MetaIoHandler<T> {
 	fn default() -> Self {
 		MetaIoHandler::with_compatibility(Default::default())
@@ -127,7 +140,6 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 			methods: Default::default(),
 		}
 	}
-
 	/// Creates new `MetaIoHandler` with specified middleware.
 	pub fn with_middleware(middleware: S) -> Self {
 		MetaIoHandler {
@@ -197,9 +209,8 @@ impl<T: Metadata, S: Middleware<T>> MetaIoHandler<T, S> {
 	/// Handle given request synchronously - will block until response is available.
 	/// If you have any asynchronous methods in your RPC it is much wiser to use
 	/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.
-	#[cfg(feature = "futures-executor")]
 	pub fn handle_request_sync(&self, request: &str, meta: T) -> Option<String> {
-		futures_executor::block_on(self.handle_request(request, meta))
+		futures::executor::block_on(self.handle_request(request, meta))
 	}
 
 	/// Handle given request asynchronously.
@@ -374,7 +385,15 @@ impl<M: Metadata> IoHandlerExtension<M> for Vec<(String, RemoteProcedure<M>)> {
 	}
 }
 
+#[cfg(feature = "std")]
 impl<M: Metadata> IoHandlerExtension<M> for HashMap<String, RemoteProcedure<M>> {
+	fn augment<S: Middleware<M>>(self, handler: &mut MetaIoHandler<M, S>) {
+		handler.methods.extend(self)
+	}
+}
+
+#[cfg(not(feature = "std"))]
+impl<M: Metadata> IoHandlerExtension<M> for BTreeMap<String, RemoteProcedure<M>> {
 	fn augment<S: Middleware<M>>(self, handler: &mut MetaIoHandler<M, S>) {
 		handler.methods.extend(self)
 	}
@@ -439,7 +458,6 @@ impl<M: Metadata + Default> IoHandler<M> {
 	/// Handle given request synchronously - will block until response is available.
 	/// If you have any asynchronous methods in your RPC it is much wiser to use
 	/// `handle_request` instead and deal with asynchronous requests in a non-blocking fashion.
-	#[cfg(feature = "futures-executor")]
 	pub fn handle_request_sync(&self, request: &str) -> Option<String> {
 		self.0.handle_request_sync(request, M::default())
 	}
@@ -484,6 +502,8 @@ fn write_response(response: Response) -> String {
 mod tests {
 	use super::{Compatibility, IoHandler};
 	use crate::types::Value;
+	#[cfg(not(feature = "std"))]
+	use alloc::string::ToString;
 
 	#[test]
 	fn test_io_handler() {
@@ -523,8 +543,12 @@ mod tests {
 
 	#[test]
 	fn test_notification() {
-		use std::sync::atomic;
-		use std::sync::Arc;
+		#[cfg(not(feature = "std"))]
+		use alloc::sync::Arc;
+		#[cfg(not(feature = "std"))]
+		use core::sync::atomic;
+		#[cfg(feature = "std")]
+		use std::sync::{atomic, Arc};
 
 		let mut io = IoHandler::new();
 
@@ -563,8 +587,12 @@ mod tests {
 
 	#[test]
 	fn test_notification_alias() {
-		use std::sync::atomic;
-		use std::sync::Arc;
+		#[cfg(not(feature = "std"))]
+		use alloc::sync::Arc;
+		#[cfg(not(feature = "std"))]
+		use core::sync::atomic;
+		#[cfg(feature = "std")]
+		use std::sync::{atomic, Arc};
 
 		let mut io = IoHandler::new();
 
@@ -576,14 +604,19 @@ mod tests {
 		io.add_alias("say_hello_alias", "say_hello");
 
 		let request = r#"{"jsonrpc": "2.0", "method": "say_hello_alias", "params": [42, 23]}"#;
+
 		assert_eq!(io.handle_request_sync(request), None);
 		assert_eq!(called.load(atomic::Ordering::SeqCst), true);
 	}
 
 	#[test]
 	fn test_batch_notification() {
-		use std::sync::atomic;
-		use std::sync::Arc;
+		#[cfg(not(feature = "std"))]
+		use alloc::sync::Arc;
+		#[cfg(not(feature = "std"))]
+		use core::sync::atomic;
+		#[cfg(feature = "std")]
+		use std::sync::{atomic, Arc};
 
 		let mut io = IoHandler::new();
 
@@ -594,6 +627,7 @@ mod tests {
 		});
 
 		let request = r#"[{"jsonrpc": "2.0", "method": "say_hello", "params": [42, 23]}]"#;
+
 		assert_eq!(io.handle_request_sync(request), None);
 		assert_eq!(called.load(atomic::Ordering::SeqCst), true);
 	}
@@ -616,6 +650,10 @@ mod tests {
 	fn test_extending_by_multiple_delegates() {
 		use super::IoHandlerExtension;
 		use crate::delegates::IoDelegate;
+		#[cfg(not(feature = "std"))]
+		use alloc::sync::Arc;
+		use sp_std::boxed::Box;
+		#[cfg(feature = "std")]
 		use std::sync::Arc;
 
 		struct Test;

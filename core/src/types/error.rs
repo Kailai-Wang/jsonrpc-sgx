@@ -1,8 +1,16 @@
 //! jsonrpc errors
+#[cfg(not(feature = "std"))]
+use alloc::{string::{ToString, String}, format};
+
+pub extern crate sp_std;
+use sp_std::borrow::ToOwned;
+
+
 use super::Value;
-use serde::de::{Deserialize, Deserializer};
-use serde::ser::{Serialize, Serializer};
-use std::fmt;
+use serde::{Serialize, Serializer, Deserialize, Deserializer};
+//use serde::de::{Deserializer};
+//use serde::ser::{Serializer};
+use sp_std::fmt;
 
 /// JSONRPC error code
 #[derive(Debug, PartialEq, Clone)]
@@ -159,10 +167,11 @@ impl Error {
 	}
 }
 
-impl std::fmt::Display for Error {
-	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl sp_std::fmt::Display for Error {
+	fn fmt(&self, f: &mut sp_std::fmt::Formatter) -> sp_std::fmt::Result {
 		write!(f, "{}: {}", self.code.description(), self.message)
 	}
 }
 
+#[cfg(feature = "std")]
 impl std::error::Error for Error {}

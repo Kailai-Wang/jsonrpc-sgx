@@ -1,7 +1,12 @@
 use crate::types::{Error, Params, Value};
 use crate::BoxFuture;
-use std::fmt;
-use std::future::Future;
+use futures::Future;
+use sp_std::boxed::Box;
+use sp_std::fmt;
+
+#[cfg(not(feature = "std"))]
+use alloc::{string::String, sync::Arc};
+#[cfg(feature = "std")]
 use std::sync::Arc;
 
 /// Metadata trait
@@ -9,6 +14,7 @@ pub trait Metadata: Clone + Send + 'static {}
 impl Metadata for () {}
 impl<T: Metadata> Metadata for Option<T> {}
 impl<T: Metadata> Metadata for Box<T> {}
+#[cfg(feature = "std")]
 impl<T: Sync + Send + 'static> Metadata for Arc<T> {}
 
 /// A future-conversion trait.
