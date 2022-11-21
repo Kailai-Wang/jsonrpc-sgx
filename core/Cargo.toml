@@ -30,7 +30,6 @@ arbitrary_precision = ["serde_json/arbitrary_precision"]
 default = ["std"]
 std = [
 	"log/std",
-	"sp-std/std",
 	"serde/std",
 	"serde_json/std",
 	"futures/std",
