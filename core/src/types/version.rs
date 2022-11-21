@@ -2,7 +2,11 @@
 use serde::de::{self, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use sp_std::fmt;
+#[cfg(not(feature = "std"))]
+use crate::alloc::fmt;
+
+#[cfg(feature = "std")]
+use std::fmt;
 
 /// Protocol Version
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq)]

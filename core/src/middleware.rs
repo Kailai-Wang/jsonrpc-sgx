@@ -1,13 +1,14 @@
 //! `IoHandler` middlewares
 
+#[cfg(not(feature = "std"))]
+use crate::alloc::boxed::Box;
+#[cfg(feature = "std")]
+use std::boxed::Box;
+
 use crate::calls::Metadata;
 use crate::types::{Call, Output, Request, Response};
-#[cfg(not(feature = "std"))]
 use core::pin::Pin;
 use futures::{future::Either, Future};
-use sp_std::boxed::Box;
-#[cfg(feature = "std")]
-use std::pin::Pin;
 
 /// RPC middleware
 pub trait Middleware<M: Metadata>: Send + Sync + 'static {

@@ -24,14 +24,10 @@
 #[cfg(not(feature = "std"))]
 pub extern crate alloc;
 
-pub extern crate sp_std;
-use sp_std::boxed::Box;
-use sp_std::str;
-
 #[cfg(not(feature = "std"))]
+use alloc::{boxed::Box, str};
+
 use core::pin::Pin;
-#[cfg(feature = "std")]
-use std::pin::Pin;
 
 #[macro_use]
 extern crate log;

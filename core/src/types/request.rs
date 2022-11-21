@@ -1,14 +1,10 @@
 //! jsonrpc request
 
 use super::{Id, Params, Version};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[cfg(not(feature = "std"))]
-use sp_std::vec::Vec;
-
-#[cfg(not(feature = "std"))]
-use alloc::string::String;
-
+use alloc::{string::String, vec::Vec};
 
 /// Represents jsonrpc request which is a method call.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -98,8 +94,8 @@ mod tests {
 	fn method_call_serialize() {
 		use serde_json;
 		use serde_json::Value;
-		use sp_std::vec;
 		use sp_std::borrow::ToOwned;
+		use sp_std::vec;
 
 		let m = MethodCall {
 			jsonrpc: Some(Version::V2),
@@ -119,8 +115,8 @@ mod tests {
 	fn notification_serialize() {
 		use serde_json;
 		use serde_json::Value;
-		use sp_std::vec;
 		use sp_std::borrow::ToOwned;
+		use sp_std::vec;
 
 		let n = Notification {
 			jsonrpc: Some(Version::V2),
@@ -136,8 +132,8 @@ mod tests {
 	fn call_serialize() {
 		use serde_json;
 		use serde_json::Value;
-		use sp_std::vec;
 		use sp_std::borrow::ToOwned;
+		use sp_std::vec;
 
 		let n = Call::Notification(Notification {
 			jsonrpc: Some(Version::V2),
@@ -152,8 +148,8 @@ mod tests {
 	#[test]
 	fn request_serialize_batch() {
 		use serde_json;
-		use sp_std::vec;
 		use sp_std::borrow::ToOwned;
+		use sp_std::vec;
 
 		let batch = Request::Batch(vec![
 			Call::MethodCall(MethodCall {
@@ -180,8 +176,8 @@ mod tests {
 	fn notification_deserialize() {
 		use serde_json;
 		use serde_json::Value;
-		use sp_std::vec;
 		use sp_std::borrow::ToOwned;
+		use sp_std::vec;
 
 		let s = r#"{"jsonrpc": "2.0", "method": "update", "params": [1,2]}"#;
 		let deserialized: Notification = serde_json::from_str(s).unwrap();
@@ -215,8 +211,8 @@ mod tests {
 	#[test]
 	fn call_deserialize() {
 		use serde_json;
-		use sp_std::vec;
 		use sp_std::borrow::ToOwned;
+		use sp_std::vec;
 
 		let s = r#"{"jsonrpc": "2.0", "method": "update", "params": [1]}"#;
 		let deserialized: Call = serde_json::from_str(s).unwrap();
@@ -281,8 +277,8 @@ mod tests {
 	#[test]
 	fn request_deserialize_batch() {
 		use serde_json;
-		use sp_std::vec;
 		use sp_std::borrow::ToOwned;
+		use sp_std::vec;
 
 		let s = r#"[{}, {"jsonrpc": "2.0", "method": "update", "params": [1,2], "id": 1},{"jsonrpc": "2.0", "method": "update", "params": [1]}]"#;
 		let deserialized: Request = serde_json::from_str(s).unwrap();

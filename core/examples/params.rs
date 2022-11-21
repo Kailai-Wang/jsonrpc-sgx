@@ -1,9 +1,7 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::ToOwned, string::String};
 use jsonrpc_core::*;
 use serde::Deserialize;
-use sp_std::borrow::ToOwned;
-#[cfg(not(feature = "std"))]
-use alloc::string::String;
-
 
 #[derive(Deserialize)]
 struct HelloParams {

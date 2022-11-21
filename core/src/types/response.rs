@@ -1,9 +1,10 @@
 //! jsonrpc response
 use super::{Error, ErrorCode, Id, Value, Version};
 use crate::Result as CoreResult;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use sp_std::{vec::Vec, vec};
+#[cfg(not(feature = "std"))]
+use crate::alloc::{vec, vec::Vec};
 
 /// Successful response
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
