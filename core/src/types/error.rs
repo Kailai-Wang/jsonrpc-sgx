@@ -164,8 +164,8 @@ impl Error {
 	}
 }
 
-impl sp_std::fmt::Display for Error {
-	fn fmt(&self, f: &mut sp_std::fmt::Formatter) -> sp_std::fmt::Result {
+impl crate::alloc::fmt::Display for Error {
+	fn fmt(&self, f: &mut alloc::fmt::Formatter) -> crate::alloc::fmt::Result {
 		write!(f, "{}: {}", self.code.description(), self.message)
 	}
 }

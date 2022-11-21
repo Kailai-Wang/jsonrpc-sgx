@@ -653,10 +653,9 @@ mod tests {
 		use super::IoHandlerExtension;
 		use crate::delegates::IoDelegate;
 		#[cfg(not(feature = "std"))]
-		use alloc::sync::Arc;
-		use sp_std::boxed::Box;
+		use alloc::{boxed::Box, sync::Arc};
 		#[cfg(feature = "std")]
-		use std::sync::Arc;
+		use std::{boxed::Box, sync::Arc};
 
 		struct Test;
 		impl Test {
