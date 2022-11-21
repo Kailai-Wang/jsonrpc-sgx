@@ -5,19 +5,20 @@ use crate::alloc::{
 		btree_map::{IntoIter, Iter},
 		BTreeMap,
 	},
-	ops::{Deref, DerefMut},
 	string::String,
 	string::ToString,
 	sync::Arc,
 	vec::Vec,
 };
-use core::pin::Pin;
+use core::{
+	ops::{Deref, DerefMut},
+	pin::Pin,
+};
 use futures::{self, future, Future, FutureExt};
 #[cfg(feature = "std")]
 use std::collections::{
 	boxed::Box,
 	hash_map::{IntoIter, Iter},
-	ops::{Deref, DerefMut},
 	sync::Arc,
 	vec::Vec,
 	HashMap,
