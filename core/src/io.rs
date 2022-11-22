@@ -1,23 +1,26 @@
 #[cfg(not(feature = "std"))]
-use alloc::{
+use crate::alloc::{
+	boxed::Box,
 	collections::{
 		btree_map::{IntoIter, Iter},
 		BTreeMap,
 	},
 	string::String,
 	string::ToString,
-};
-use core::pin::Pin;
-use futures::{self, future, Future, FutureExt};
-use sp_std::{
-	boxed::Box,
-	ops::{Deref, DerefMut},
 	sync::Arc,
 	vec::Vec,
 };
+use core::{
+	ops::{Deref, DerefMut},
+	pin::Pin,
+};
+use futures::{self, future, Future, FutureExt};
 #[cfg(feature = "std")]
 use std::collections::{
+	boxed::Box,
 	hash_map::{IntoIter, Iter},
+	sync::Arc,
+	vec::Vec,
 	HashMap,
 };
 
@@ -651,10 +654,9 @@ mod tests {
 		use super::IoHandlerExtension;
 		use crate::delegates::IoDelegate;
 		#[cfg(not(feature = "std"))]
-		use alloc::sync::Arc;
-		use sp_std::boxed::Box;
+		use alloc::{boxed::Box, sync::Arc};
 		#[cfg(feature = "std")]
-		use std::sync::Arc;
+		use std::{boxed::Box, sync::Arc};
 
 		struct Test;
 		impl Test {

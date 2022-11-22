@@ -1,17 +1,11 @@
 //! Delegate rpc calls
-#[cfg(not(feature = "std"))]
-use alloc::collections::BTreeMap;
-#[cfg(feature = "std")]
-use std::collections::HashMap;
 
 use futures::Future;
 
 #[cfg(not(feature = "std"))]
-use alloc::{string::String, sync::Arc};
+use crate::alloc::{boxed::Box, collections::BTreeMap, string::String, sync::Arc};
 #[cfg(feature = "std")]
-use std::sync::Arc;
-
-use sp_std::boxed::Box;
+use std::{boxed::Box, collections::HashMap, string::String, sync::Arc, sync::Arc};
 
 use crate::calls::{Metadata, RemoteProcedure, RpcMethod, RpcNotification};
 

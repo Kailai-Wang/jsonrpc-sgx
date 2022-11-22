@@ -24,14 +24,10 @@
 #[cfg(not(feature = "std"))]
 pub extern crate alloc;
 
-pub extern crate sp_std;
-use sp_std::boxed::Box;
-use sp_std::str;
-
 #[cfg(not(feature = "std"))]
+use alloc::{boxed::Box, str};
+
 use core::pin::Pin;
-#[cfg(feature = "std")]
-use std::pin::Pin;
 
 #[macro_use]
 extern crate log;
@@ -51,7 +47,7 @@ pub mod middleware;
 pub mod types;
 
 /// A Result type.
-pub type Result<T> = sp_std::result::Result<T, Error>;
+pub type Result<T> = core::result::Result<T, Error>;
 
 /// A `Future` trait object.
 pub type BoxFuture<T> = Pin<Box<dyn futures::Future<Output = T> + Send>>;
@@ -73,7 +69,7 @@ use serde_json::Error as SerdeError;
 /// workaround for https://github.com/serde-rs/json/issues/505
 /// Arbitrary precision confuses serde when deserializing into untagged enums,
 /// this is a workaround
-pub fn serde_from_str<'a, T>(input: &'a str) -> sp_std::result::Result<T, SerdeError>
+pub fn serde_from_str<'a, T>(input: &'a str) -> core::result::Result<T, SerdeError>
 where
 	T: serde::de::Deserialize<'a>,
 {

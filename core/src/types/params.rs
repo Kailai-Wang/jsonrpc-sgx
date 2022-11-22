@@ -1,15 +1,10 @@
 //! jsonrpc params field
-use serde::{Serialize, Deserialize};
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 use serde_json::value::from_value;
 
-use sp_std::vec::Vec;
-
 #[cfg(not(feature = "std"))]
-use alloc::string::String;
-#[cfg(not(feature = "std"))]
-use alloc::format;
-
+use alloc::{format, string::String, vec::Vec};
 
 use super::{Error, Value};
 
@@ -63,9 +58,9 @@ mod tests {
 	use serde_json;
 
 	#[cfg(not(feature = "std"))]
-	use alloc::vec;
-	#[cfg(not(feature = "std"))]
 	use alloc::string::ToString;
+	#[cfg(not(feature = "std"))]
+	use alloc::vec;
 
 	#[test]
 	fn params_deserialization() {

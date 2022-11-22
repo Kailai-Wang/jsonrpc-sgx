@@ -25,18 +25,11 @@ serde        	  = { git = "https://github.com/mesalock-linux/serde-sgx", feature
 serde_json        = { git = "https://github.com/mesalock-linux/serde-json-sgx", features = ["alloc"]}
 serde_derive      = { git = "https://github.com/mesalock-linux/serde-sgx" }
 
-[dependencies.sp-std]
-git = "https://github.com/paritytech/substrate.git"
-branch = "master"
-version = "4.0.0-dev"
-default-features = false
-
 [features]
 arbitrary_precision = ["serde_json/arbitrary_precision"]
 default = ["std"]
 std = [
 	"log/std",
-	"sp-std/std",
 	"serde/std",
 	"serde_json/std",
 	"futures/std",
