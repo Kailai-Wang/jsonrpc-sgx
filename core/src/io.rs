@@ -16,12 +16,12 @@ use core::{
 };
 use futures::{self, future, Future, FutureExt};
 #[cfg(feature = "std")]
-use std::collections::{
+use std::{
 	boxed::Box,
-	hash_map::{IntoIter, Iter},
+	collections::hash_map::{IntoIter, Iter},
 	sync::Arc,
 	vec::Vec,
-	HashMap,
+	collections::HashMap,
 };
 
 use crate::calls::{

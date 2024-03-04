@@ -2,7 +2,7 @@
 #[cfg(not(feature = "std"))]
 use alloc::{
 	borrow::ToOwned,
-	fmt, format,
+	format,
 	string::{String, ToString},
 };
 
@@ -140,7 +140,7 @@ impl Error {
 	pub fn invalid_params_with_details<M, T>(message: M, details: T) -> Error
 	where
 		M: Into<String>,
-		T: fmt::Debug,
+		T: core::fmt::Debug,
 	{
 		Error {
 			code: ErrorCode::InvalidParams,
@@ -164,8 +164,8 @@ impl Error {
 	}
 }
 
-impl crate::alloc::fmt::Display for Error {
-	fn fmt(&self, f: &mut alloc::fmt::Formatter) -> crate::alloc::fmt::Result {
+impl core::fmt::Display for Error {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		write!(f, "{}: {}", self.code.description(), self.message)
 	}
 }

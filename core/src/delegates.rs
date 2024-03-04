@@ -5,7 +5,7 @@ use futures::Future;
 #[cfg(not(feature = "std"))]
 use crate::alloc::{boxed::Box, collections::BTreeMap, string::String, sync::Arc};
 #[cfg(feature = "std")]
-use std::{boxed::Box, collections::HashMap, string::String, sync::Arc, sync::Arc};
+use std::{boxed::Box, collections::HashMap, string::String, sync::Arc};
 
 use crate::calls::{Metadata, RemoteProcedure, RpcMethod, RpcNotification};
 
